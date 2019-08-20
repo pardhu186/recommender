@@ -1,0 +1,4 @@
+import numpy as np
+import pandas as pd
+url = 'copied_raw_GH_link'
+df1 = pd.read_csv(url)
