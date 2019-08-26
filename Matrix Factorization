@@ -1,0 +1,57 @@
+import numpy as np
+import pandas as pd
+url1 = 'https://raw.githubusercontent.com/pardhu186/recommender/master/movies.csv'
+url2 = 'https://raw.githubusercontent.com/pardhu186/recommender/master/ratings.csv'
+movies = pd.read_csv(url1,sep=',',index_col=None)
+ratings = pd.read_csv(url2,sep=',',index_col=None)
+ratings.drop(['timestamp'],axis=1,inplace=True)
+
+def replace_name(x):
+  return movies[movies['movieId']==x].title.values[0]
+ratings.movieId = ratings.movieId.map(replace_name)
+
+Matrix
+
+M=ratings.pivot_table(index=['userId'],columns=['movieId'],values='rating')
+M
+
+Pearsons r
+
+def pearson(s1,s2):
+  s1_c = s1 - s1.mean()
+  s2_c = s2 - s2.mean()
+  return np.sum(s1_c * s2_c) / np.sqrt(np.sum(s1_c ** 2) * np.sum(s2_c ** 2))
+  
+  Top-N Recommendations
+  
+  def get_recs(movie_name,M,num):
+  import numpy as np
+  reviews=[]
+  for title in M.columns:
+    if title == movie_name:
+      continue
+    cor = pearson(M[movie_name],M[title])
+    if np.isnan(cor):
+      continue
+    else:
+      reviews.append((title,cor))
+  reviews.sort(key=lambda tup: tup[1],reverse=True)
+  return reviews[:num]
+  
+  Execution :-
+  
+  recs = get_recs('Harry Potter and the Sorcerer\'s Stone (a.k.a. Harry Potter and the Philosopher\'s Stone) (2001)',M,10)
+  recs[:10]
+  
+  Output :-
+  
+[('Harry Potter and the Chamber of Secrets (2002)', 0.5864428908277296),
+ ('Harry Potter and the Prisoner of Azkaban (2004)', 0.486344064383274),
+ ('Harry Potter and the Deathly Hallows: Part 1 (2010)', 0.4578461014540843),
+ ('Harry Potter and the Half-Blood Prince (2009)', 0.43261423877936267),
+ ('Harry Potter and the Goblet of Fire (2005)', 0.43178996248200396),
+ ('Harry Potter and the Order of the Phoenix (2007)', 0.3636197260295375),
+ ('Harry Potter and the Deathly Hallows: Part 2 (2011)', 0.35846696208555656),
+ ('Chronicles of Narnia: The Lion, the Witch and the Wardrobe, The (2005)',0.3048420724005231),
+ ("Pirates of the Caribbean: Dead Man's Chest (2006)", 0.3033572825620932),
+ ('The Hunger Games: Catching Fire (2013)', 0.28612198563395747)]
